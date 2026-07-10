@@ -3,24 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use App\Health\Checks\PingCheck;
 use App\Health\Checks\DatabaseCheck;
 use App\Health\Checks\RedisCheck;
 
 class HealthController extends Controller
 {
-    /**
-     * K8S Liveness Probe (存活探針：只查自己，掛了就重啟)
-     */
-    public function liveness(): JsonResponse
-    {
-        $checks = [
-            new PingCheck(),
-        ];
-
-        return $this->runChecks($checks);
-    }
-
     /**
      * K8S Readiness Probe (就緒探針：查外部依賴，掛了就拔除流量)
      */

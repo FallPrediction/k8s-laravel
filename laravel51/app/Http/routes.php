@@ -16,7 +16,6 @@ Route::get('/', function () {
 });
 
 Route::group(['prefix' => 'health'], function () {
-    Route::get('liveness', 'HealthController@liveness');
     Route::get('readiness', 'HealthController@readiness');
     Route::get('worker-readiness', 'HealthController@workerReadiness');
 });
