@@ -33,6 +33,10 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     zip \
     opcache
 
+# ------- php fpm -----
+RUN apt update && apt install libfcgi-bin -y
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
+
 # ---------- composer ----------
 COPY --from=composer:2.2.25 /usr/bin/composer /usr/bin/composer
 
