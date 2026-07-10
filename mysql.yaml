@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.7
+        name: mysql
+        ports:
+        - containerPort: 3306
+        resources: {}
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: "forge"
+        - name: MYSQL_USER
+          value: "forge"
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pwd
+              key: PASSWORD
+        envFrom:
+        - secretRef:
+            name: mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql
+status: {}
+---
+apiVersion: v1
+data:
+  DB_PASSWORD: eHlIQmg3RVlBd1hxQXFMeXJGcEc=
+  MYSQL_ROOT_PASSWORD: WVUzcndzdkpSUk40
+kind: Secret
+metadata:
+  name: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi

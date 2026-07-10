@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api
+  name: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: nginx
+        image: elizabethhuang/nginx:1.1
+        ports:
+        - containerPort: 80
+        resources: {}
+        restartPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: 80
+      initContainers:
+      - name: php-fpm
+        image: elizabethhuang/laravel51:1.3
+        ports:
+        - containerPort: 9000
+        restartPolicy: Always
+        startupProbe:
+          tcpSocket:
+            port: 9000
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "SCRIPT_NAME=/ping SCRIPT_FILENAME=/ping REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000"
+        envFrom:
+          - secretRef:
+              name: api
+        env:
+          - name: DB_HOST
+            value: "mysql"
+          - name: CACHE_DRIVER
+            value: "redis"
+          - name: REDIS_HOST
+            value: "redis"
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-pwd
+                key: PASSWORD
+status: {}
+---
+apiVersion: v1
+data:
+  APP_KEY: VVFXSjkzQzVHeWg1YkVXb2p3d2pCb1F2VGhqVjVTY2s=
+kind: Secret
+metadata:
+  name: api
