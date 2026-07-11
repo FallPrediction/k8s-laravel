@@ -51,26 +51,15 @@ spec:
         envFrom:
           - secretRef:
               name: api
+          - configMapRef:
+              name: api
         env:
-          - name: DB_HOST
-            value: "mysql"
-          - name: CACHE_DRIVER
-            value: "redis"
-          - name: REDIS_HOST
-            value: "redis"
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: mysql-pwd
                 key: PASSWORD
 status: {}
----
-apiVersion: v1
-data:
-  APP_KEY: VVFXSjkzQzVHeWg1YkVXb2p3d2pCb1F2VGhqVjVTY2s=
-kind: Secret
-metadata:
-  name: api
 ---
 apiVersion: v1
 kind: Service
