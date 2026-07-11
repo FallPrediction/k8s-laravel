@@ -6,3 +6,4 @@ data:
   CACHE_DRIVER: redis
   DB_HOST: mysql
   REDIS_HOST: redis
+  QUEUE_DRIVER: redis

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: worker-inventory
+  name: worker-inventory
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: worker-inventory
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+  template:
+    metadata:
+      labels:
+        app: worker-inventory
+    spec:
+      containers:
+      - image: elizabethhuang/laravel51:1.12
+        name: worker-inventory
+        restartPolicy: Always
+        envFrom:
+          - secretRef:
+              name: api
+          - configMapRef:
+              name: api
+        env:
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-pwd
+                key: PASSWORD
+        command: ["php", "artisan", "queue:work", "--queue=inventory", "--daemon"] # Laravel 5.1 需要加上 --daemon
+        readinessProbe:
+          exec:
+            command:
+              - php
+              - artisan
+              - readiness
+        resources: {}
+status: {}
