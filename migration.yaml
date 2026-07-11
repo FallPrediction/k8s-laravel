@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migration
+spec:
+  template:
+    metadata: {}
+    spec:
+      containers:
+      - image: elizabethhuang/laravel51:1.2
+        name: migration
+        envFrom:
+          - secretRef:
+              name: api
+          - configMapRef:
+              name: api
+        env:
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-pwd
+                key: PASSWORD
+        command: ["php", "artisan", "migrate", "--force"]
+        resources: {}
+      restartPolicy: Never
+status: {}
