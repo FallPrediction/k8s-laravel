@@ -19,3 +19,11 @@ Route::group(['prefix' => 'health'], function () {
     Route::get('readiness', 'HealthController@readiness');
     Route::get('worker-readiness', 'HealthController@workerReadiness');
 });
+
+Route::group(['prefix' => 'api'], function () {
+    Route::group(['prefix' => 'jobs'], function () {
+        Route::post('inventory', 'JobController@dispatchInventory');
+        Route::post('notification', 'JobController@dispatchNotification');
+        Route::post('invoice', 'JobController@dispatchInvoice');
+    });
+});

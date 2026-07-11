@@ -35,7 +35,7 @@ spec:
             port: 80
       initContainers:
       - name: php-fpm
-        image: elizabethhuang/laravel51:1.3
+        image: elizabethhuang/laravel51:1.12
         ports:
         - containerPort: 9000
         restartPolicy: Always
