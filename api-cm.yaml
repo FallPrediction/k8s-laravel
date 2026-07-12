@@ -4,6 +4,6 @@ metadata:
   name: api
 data:
   CACHE_DRIVER: redis
-  DB_HOST: mysql
+  DB_HOST: mysql-0.mysql
   REDIS_HOST: redis-0.redis
   QUEUE_DRIVER: redis

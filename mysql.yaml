@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   labels:
     app: mysql
@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: mysql
-  strategy: {}
+  serviceName: mysql
   template:
     metadata:
       labels:
@@ -22,7 +22,7 @@ spec:
         - containerPort: 3306
         resources: {}
         volumeMounts:
-        - name: mysql-persistent-storage
+        - name: mysql
           mountPath: /var/lib/mysql
         env:
         - name: MYSQL_DATABASE
@@ -37,10 +37,14 @@ spec:
         envFrom:
         - secretRef:
             name: mysql
-      volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 128Mi
 status: {}
 ---
 apiVersion: v1
@@ -62,18 +66,8 @@ spec:
   - port: 3306
     protocol: TCP
     targetPort: 3306
+  clusterIP: None
   selector:
     app: mysql
 status:
   loadBalancer: {}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 128Mi
