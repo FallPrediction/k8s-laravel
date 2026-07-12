@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: worker-default
+  name: worker-default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker-default
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: worker-default
+    spec:
+      containers:
+      - image: elizabethhuang/laravel51:1.12
+        name: worker-default
+        restartPolicy: Always
+        envFrom:
+          - secretRef:
+              name: api
+          - configMapRef:
+              name: api
+        env:
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-pwd
+                key: PASSWORD
+        command: ["php", "artisan", "queue:work", "--queue=invoice,notification", "--daemon"] # Laravel 5.1 需要加上 --daemon
+        readinessProbe:
+          exec:
+            command:
+              - php
+              - artisan
+              - readiness
+        resources: {}
+status: {}
