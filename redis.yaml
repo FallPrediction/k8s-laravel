@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   labels:
     app: redis
@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: redis
-  strategy: {}
+  serviceName: redis
   template:
     metadata:
       labels:
@@ -34,6 +34,7 @@ spec:
   - port: 6379
     protocol: TCP
     targetPort: 6379
+  clusterIP: None
   selector:
     app: redis
 status:
