@@ -19,6 +19,8 @@ RUN echo "deb http://archive.debian.org/debian buster main contrib non-free" > /
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pecl install redis-5.3.7 && docker-php-ext-enable redis
+
 # ---------- php extensions ----------
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
   && docker-php-ext-install -j$(nproc) \

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: deploy-redis
+  name: deploy-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deploy-redis
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: deploy-redis
+    spec:
+      containers:
+      - image: readiness:8.8
+        name: readiness
+        ports:
+        - containerPort: 6379
+        resources: {}
+status: {}
