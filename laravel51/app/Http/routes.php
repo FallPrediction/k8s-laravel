@@ -15,6 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('metrics', 'MetricsController@index');
+
 Route::group(['prefix' => 'health'], function () {
     Route::get('readiness', 'HealthController@readiness');
     Route::get('worker-readiness', 'HealthController@workerReadiness');
