@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: schedule
+  name: schedule
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schedule
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: schedule
+    spec:
+      terminationGracePeriodSeconds: 300
+      # cron 需要 root 才能建立 /etc/cron.d/laravel-cron 並以前景模式啟動。
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+      - image: elizabethhuang/laravel51:1.15
+        name: laravel51
+        restartPolicy: Always
+        envFrom:
+          - secretRef:
+              name: api
+          - configMapRef:
+              name: api
+        env:
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-pwd
+                key: PASSWORD
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # 1. 導出當前 K8S 注入的所有環境變數到檔案（包含您的 secretRef, configMapRef 與 DB_PASSWORD）
+            declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /var/www/html/.env
+
+            # 2. 建立排程檔案
+            # - 先用 . /var/www/html/.env 載入變數，讓 Laravel 能讀到資料庫密碼
+            # - 使用 /usr/local/bin/php 絕對路徑避免找不到指令
+            # - 修正重導向：改為 >> /proc/1/fd/1，這樣你直接用 kubectl logs 就能看到排程輸出了！
+            echo "* * * * * root . /var/www/html/.env; /usr/local/bin/php /var/www/html/artisan schedule:run >> /proc/1/fd/1 2>&1" > /etc/cron.d/laravel-cron
+
+            # 3. 確保檔案最後有一行完全的空白行，Debian cron 嚴格要求此格式
+            echo "" >> /etc/cron.d/laravel-cron
+
+            # 4. 更改權限，維持 0644 規範
+            chmod 0644 /etc/cron.d/laravel-cron
+
+            # 5. 啟動 cron 服務並保持在前台（PID 1）以維持 Pod 運作
+            cron -f
+        readinessProbe:
+          exec:
+            command:
+              - php
+              - artisan
+              - readiness
+        resources: {}
+status: {}

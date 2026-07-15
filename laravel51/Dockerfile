@@ -49,6 +49,9 @@ RUN composer install \
     --optimize-autoloader \
     --no-interaction
 
+# ------ cron(for schedule) ------
+RUN apt-get install cron -y
+
 # ---------- permissions ----------
 RUN mkdir -p storage bootstrap/cache \
   && chown -R www-data:www-data storage bootstrap/cache \
