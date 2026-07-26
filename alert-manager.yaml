@@ -1,0 +1,90 @@
+# See https://devopscube.com/alert-manager-kubernetes-guide/
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+data:
+  config.yml: |-
+    route:
+      receiver: telegram
+
+    receivers:
+      - name: telegram
+        telegram_configs:
+          - bot_token_file: /etc/alertmanager/token
+            chat_id_file: /etc/alertmanager/chat-id
+            send_resolved: true
+---
+apiVersion: v1
+data:
+  chat-id: my_telegram_chat_id
+  token: my_telegram_token
+kind: Secret
+metadata:
+  name: alertmanager-secret
+  namespace: monitoring
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alert-manager
+  name: alert-manager
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alert-manager
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: alert-manager
+    spec:
+      containers:
+      - image: prom/alertmanager
+        name: alertmanager
+        args:
+          - --config.file=/etc/alertmanager/config.yml
+        ports:
+        - containerPort: 9093
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alertmanager
+          readOnly: true
+        resources:
+          requests:
+            cpu: 500m
+            memory: 500M
+          limits:
+            cpu: 1
+            memory: 1Gi
+      volumes:
+      - name: config
+        projected:
+          sources:
+          - configMap:
+              name: alertmanager-config
+          - secret:
+              name: alertmanager-secret
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: alert-manager
+  name: alert-manager
+  namespace: monitoring
+spec:
+  ports:
+  - port: 9093
+    protocol: TCP
+    targetPort: 9093
+  selector:
+    app: alert-manager
+  type: NodePort
+status:
+  loadBalancer: {}
