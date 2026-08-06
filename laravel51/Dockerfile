@@ -44,17 +44,14 @@ COPY --from=composer:2.2.25 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-RUN composer install \
-    --no-dev \
-    --optimize-autoloader \
-    --no-interaction
+# Run the application-aware Composer hooks only after the full source tree is
+# present; dependency downloads remain cached in the vendor stage.
+RUN composer dump-autoload --no-dev --optimize \
+  && mkdir -p storage bootstrap/cache \
+  && chown -R www-data:www-data storage bootstrap/cache \
+  && chmod -R 775 storage bootstrap/cache
 
 # ------ cron(for schedule) ------
 RUN apt-get install cron -y
-
-# ---------- permissions ----------
-RUN mkdir -p storage bootstrap/cache \
-  && chown -R www-data:www-data storage bootstrap/cache \
-  && chmod -R 775 storage bootstrap/cache
 
 CMD ["php-fpm"]
