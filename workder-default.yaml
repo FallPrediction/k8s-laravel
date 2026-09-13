@@ -19,7 +19,7 @@ spec:
         app: worker-default
     spec:
       containers:
-      - image: elizabethhuang/laravel51:1.12
+      - image: elizabethhuang/laravel13:1.0
         name: worker-default
         restartPolicy: Always
         envFrom:
@@ -33,7 +33,7 @@ spec:
               secretKeyRef:
                 name: postgres-pwd
                 key: PASSWORD
-        command: ["php", "artisan", "queue:work", "--queue=invoice,notification", "--daemon"]
+        command: ["php", "artisan", "queue:work", "--queue=invoice,notification"]
         readinessProbe:
           exec:
             command:

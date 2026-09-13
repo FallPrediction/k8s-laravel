@@ -7,7 +7,7 @@ spec:
     metadata: {}
     spec:
       containers:
-      - image: elizabethhuang/laravel51:1.2
+      - image: elizabethhuang/laravel13:1.0
         name: migration
         envFrom:
           - secretRef:

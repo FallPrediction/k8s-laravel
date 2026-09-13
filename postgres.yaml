@@ -23,7 +23,7 @@ spec:
         resources: {}
         volumeMounts:
         - name: postgres
-          mountPath: /var/lib/postgres
+          mountPath: /var/lib/postgresql
         env:
         - name: POSTGRES_DB
           value: "laravel"

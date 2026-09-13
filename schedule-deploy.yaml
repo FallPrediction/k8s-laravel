@@ -22,8 +22,8 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       containers:
-      - image: elizabethhuang/laravel51:1.15
-        name: laravel51
+      - image: elizabethhuang/laravel13:1.0
+        name: schedule
         restartPolicy: Always
         envFrom:
           - secretRef:

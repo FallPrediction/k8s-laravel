@@ -19,7 +19,7 @@ spec:
         app: worker-inventory
     spec:
       containers:
-      - image: elizabethhuang/laravel51:1.12
+      - image: elizabethhuang/laravel13:1.0
         name: worker-inventory
         restartPolicy: Always
         envFrom:
@@ -33,7 +33,7 @@ spec:
               secretKeyRef:
                 name: postgres-pwd
                 key: PASSWORD
-        command: ["php", "artisan", "queue:work", "--queue=inventory", "--daemon"]
+        command: ["php", "artisan", "queue:work", "--queue=inventory"]
         readinessProbe:
           exec:
             command:
