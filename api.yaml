@@ -23,16 +23,17 @@ spec:
         image: elizabethhuang/laravel13-nginx:1.0
         ports:
         - containerPort: 80
+        - containerPort: 8080
         resources: {}
         restartPolicy: Always
         livenessProbe:
           httpGet:
-            path: /health/liveness
+            path: /api/health/liveness
             port: 80
         readinessProbe:
           httpGet:
-            path: /health/readiness
-            port: 80
+            path: /api/health/readiness
+            port: 8080
       initContainers:
       - name: php-fpm
         image: elizabethhuang/laravel13:1.0
