@@ -3,4 +3,4 @@ data:
   PASSWORD: eHlIQmg3RVlBd1hxQXFMeXJGcEc=
 kind: Secret
 metadata:
-  name: mysql-pwd
+  name: postgres-pwd

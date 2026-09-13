@@ -31,9 +31,9 @@ spec:
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: mysql-pwd
+                name: postgres-pwd
                 key: PASSWORD
-        command: ["php", "artisan", "queue:work", "--queue=invoice,notification", "--daemon"] # Laravel 5.1 需要加上 --daemon
+        command: ["php", "artisan", "queue:work", "--queue=invoice,notification", "--daemon"]
         readinessProbe:
           exec:
             command:

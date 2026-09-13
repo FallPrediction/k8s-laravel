@@ -57,7 +57,7 @@ spec:
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: mysql-pwd
+                name: postgres-pwd
                 key: PASSWORD
 status: {}
 ---
